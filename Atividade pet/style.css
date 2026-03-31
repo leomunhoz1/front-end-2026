@@ -1,0 +1,160 @@
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  font-family: 'Nunito', sans-serif;
+  background: #1e1b2e;
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #f0e6ff;
+}
+
+.container {
+  background: #2a2540;
+  border: 1px solid #3d3660;
+  border-radius: 28px;
+  padding: 32px 28px;
+  width: min(420px, 94vw);
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+  box-shadow: 0 8px 32px rgba(0,0,0,0.4);
+}
+
+/* ---- NOME ---- */
+.name-section {
+  text-align: center;
+}
+
+.name-display {
+  font-family: 'Baloo 2', cursive;
+  font-size: 2rem;
+  font-weight: 800;
+  color: #ffe566;
+  margin-bottom: 12px;
+}
+
+.name-input-row {
+  display: flex;
+  gap: 8px;
+}
+
+.name-input-row input {
+  flex: 1;
+  background: #1e1b2e;
+  border: 1.5px solid #3d3660;
+  border-radius: 12px;
+  padding: 9px 14px;
+  font-family: 'Nunito', sans-serif;
+  font-size: 0.9rem;
+  color: #f0e6ff;
+  outline: none;
+}
+
+.name-input-row input:focus {
+  border-color: #ff6eb4;
+}
+
+.name-input-row input::placeholder {
+  color: #7a6fa0;
+}
+
+.name-input-row button {
+  background: #ff6eb4;
+  border: none;
+  border-radius: 12px;
+  padding: 9px 16px;
+  font-family: 'Nunito', sans-serif;
+  font-weight: 700;
+  font-size: 0.85rem;
+  color: #fff;
+  cursor: pointer;
+}
+
+.name-input-row button:hover {
+  background: #e055a0;
+}
+
+/* ---- PET ---- */
+.pet-area {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+}
+
+.pet-bubble {
+  background: #3d3660;
+  border-radius: 16px 16px 16px 4px;
+  padding: 8px 16px;
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: #f0e6ff;
+  opacity: 0;
+  transition: opacity 0.3s;
+  min-height: 36px;
+  text-align: center;
+}
+
+.pet-bubble.visible {
+  opacity: 1;
+}
+
+#petImage {
+  width: 180px;
+  height: 180px;
+  object-fit: contain;
+  image-rendering: pixelated;
+  transition: opacity 0.2s;
+  animation: float 3s ease-in-out infinite;
+}
+
+#petImage.sleeping {
+  animation: none;
+}
+
+@keyframes float {
+  0%, 100% { transform: translateY(0); }
+  50%       { transform: translateY(-10px); }
+}
+
+.state-badge {
+  background: #3d3660;
+  border-radius: 99px;
+  padding: 4px 16px;
+  font-size: 0.8rem;
+  font-weight: 700;
+  color: #b8a8d8;
+}
+
+/* ---- BOTÕES ---- */
+.actions {
+  display: flex;
+  gap: 10px;
+  justify-content: center;
+}
+
+.btn {
+  border: none;
+  border-radius: 16px;
+  padding: 12px 20px;
+  font-family: 'Nunito', sans-serif;
+  font-size: 0.9rem;
+  font-weight: 700;
+  color: #fff;
+  cursor: pointer;
+  transition: transform 0.15s, opacity 0.2s;
+}
+
+.btn:hover { transform: translateY(-2px); }
+.btn:active { transform: scale(0.96); }
+.btn:disabled { opacity: 0.35; cursor: not-allowed; transform: none; }
+
+.feed-btn  { background: #ff6b6b; }
+.sleep-btn { background: #5c7cfa; }
+.wake-btn  { background: #ffe566; color: #3a2d00; display: none; }

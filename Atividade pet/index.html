@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Meu Pet Virtual</title>
+  <link rel="stylesheet" href="style.css" />
+  <link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@700;800&family=Nunito:wght@600;700&display=swap" rel="stylesheet"/>
+</head>
+<body>
+
+  <div class="container">
+
+    <!-- Nome do pet -->
+    <div class="name-section">
+      <div class="name-display" id="nameDisplay">Meu Pet</div>
+      <div class="name-input-row">
+        <input type="text" id="nameInput" placeholder="Digite o nome do seu pet..." maxlength="20" />
+        <button onclick="setName()">✔ Salvar</button>
+      </div>
+    </div>
+
+    <!-- Pet -->
+    <div class="pet-area">
+      <div class="pet-bubble" id="messageBubble"></div>
+      <img id="petImage" src="idle.png" alt="Pet" draggable="false" />
+      <div class="state-badge" id="stateBadge">😊 Feliz</div>
+    </div>
+
+    <!-- Botões -->
+    <div class="actions">
+      <button class="btn feed-btn" onclick="feedPet()">🍔 Alimentar</button>
+      <button class="btn sleep-btn" onclick="sleepPet()">😴 Dormir</button>
+      <button class="btn wake-btn" id="wakeBtn" onclick="wakePet()">☀️ Acordar</button>
+    </div>
+
+  </div>
+
+  <script src="script.js"></script>
+</body>
+</html>
