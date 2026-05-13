@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+<meta charset="UTF-8">
+<title>Convidados VIP</title>
+<style>
+body{
+    font-family: Arial;
+    background:#f0f0f0;
+}
+
+.card{
+    width:400px;
+    margin:50px auto;
+    background:white;
+    padding:20px;
+    border-radius:10px;
+    box-shadow:0 0 10px rgba(0,0,0,0.2);
+}
+
+input, button{
+    padding:8px;
+    margin:5px;
+}
+
+li{
+    margin-top:10px;
+    border-bottom:1px solid #ccc;
+    padding-bottom:10px;
+}
+
+.riscado{
+    text-decoration: line-through;
+}
+</style>
+</head>
+<body>
+
+<div class="card">
+
+<h2>Lista VIP</h2>
+
+<input type="text" id="nome" placeholder="Nome">
+<button onclick="adicionar()">Adicionar</button>
+
+<ul id="lista"></ul>
+
+</div>
+
+<script>
+function adicionar(){
+
+    let nome = document.getElementById("nome").value.trim();
+
+    if(nome == ""){
+        return;
+    }
+
+    let li = document.createElement("li");
+
+    let span = document.createElement("span");
+    span.innerHTML = nome;
+
+    let concluir = document.createElement("button");
+    concluir.innerHTML = "Concluir";
+
+    let editar = document.createElement("button");
+    editar.innerHTML = "Editar";
+
+    let excluir = document.createElement("button");
+    excluir.innerHTML = "Excluir";
+
+    concluir.onclick = function(){
+        span.classList.toggle("riscado");
+    }
+
+    editar.onclick = function(){
+        let novoNome = prompt("Novo nome:");
+        if(novoNome){
+            span.innerHTML = novoNome;
+        }
+    }
+
+    excluir.onclick = function(){
+        li.remove();
+    }
+
+    li.appendChild(span);
+    li.appendChild(concluir);
+    li.appendChild(editar);
+    li.appendChild(excluir);
+
+    document.getElementById("lista").appendChild(li);
+
+    document.getElementById("nome").value = "";
+}
+</script>
+
+</body>
+</html>
