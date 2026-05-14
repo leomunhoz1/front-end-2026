@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+<meta charset="UTF-8">
+<title>Validador de Cartão</title>
+
+<style>
+body{
+    font-family: Arial;
+    text-align:center;
+    margin-top:50px;
+}
+
+input,
+button{
+    padding:10px;
+    margin:5px;
+}
+
+#painel{
+    width:300px;
+    margin:20px auto;
+    padding:15px;
+    border:1px solid #ccc;
+}
+</style>
+
+</head>
+<body>
+
+<h2>Validador de Segurança Infinity</h2>
+
+<input type="text" id="cartao" placeholder="Digite o cartão">
+
+<button onclick="analisar()">Analisar Cartão</button>
+
+<div id="painel"></div>
+
+<script>
+function analisar(){
+
+    let numero = document.getElementById("cartao").value.replace(/\D/g,'');
+
+    let painel = document.getElementById("painel");
+
+    if(numero.length < 13 || numero.length > 16){
+
+        painel.innerHTML = "Número inválido";
+        return;
+    }
+
+    let soma = 0;
+
+    let alternar = false;
+
+    for(let i = numero.length - 1; i >= 0; i--){
+
+        let digito = Number(numero[i]);
+
+        if(alternar){
+
+            digito *= 2;
+
+            if(digito > 9){
+                digito -= 9;
+            }
+        }
+
+        soma += digito;
+
+        alternar = !alternar;
+    }
+
+    let valido = soma % 10 === 0;
+
+    let bandeira = "Desconhecida";
+
+    let banco = "Não identificado";
+
+    let setor = "Financeiro";
+
+    if(numero.startsWith("4")){
+        bandeira = "Visa";
+        banco = "Visa Bank";
+    }
+    else if(numero.startsWith("5")){
+        bandeira = "MasterCard";
+        banco = "Master Bank";
+    }
+    else if(numero.startsWith("3")){
+        bandeira = "American Express";
+        banco = "Amex Bank";
+    }
+
+    painel.innerHTML =
+    "Status: " + (valido ? "Válido" : "Inválido") +
+    "<br>Bandeira: " + bandeira +
+    "<br>Categoria de Setor: " + setor +
+    "<br>Banco Emissor: " + banco;
+
+    painel.style.color = valido ? "green" : "red";
+}
+</script>
+
+</body>
+</html>
