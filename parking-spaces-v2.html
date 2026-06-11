@@ -1,0 +1,1060 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1"/>
+<meta name="description" content="Parking Spaces – Gestão Inteligente de Estacionamento"/>
+<title>Parking Spaces</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+<link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Geist:wght@300;400;500;600&display=swap" rel="stylesheet"/>
+<style>
+/* ── RESET ── */
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+img,svg{display:block;max-width:100%}
+a{color:inherit;text-decoration:none}
+button{cursor:pointer;font-family:inherit;border:none;background:none}
+ul{list-style:none}
+
+/* ── TOKENS ── */
+:root{
+  --bg:       #FAFAF9;
+  --bg2:      #F4F3F0;
+  --bg3:      #ECEAE5;
+  --ink:      #0A0A0A;
+  --ink2:     #3D3D3D;
+  --ink3:     #8A8A8A;
+  --ink4:     #C4C4C4;
+  --blue:     #0066FF;
+  --blue-dk:  #0052CC;
+  --blue-bg:  #EEF4FF;
+  --green:    #16A34A;
+  --red:      #DC2626;
+  --amber:    #D97706;
+  --serif:    'Instrument Serif', Georgia, serif;
+  --sans:     'Geist', system-ui, sans-serif;
+  --r:        10px;
+  --ease:     cubic-bezier(.4,0,.2,1);
+}
+
+/* ── BASE ── */
+body{
+  font-family:var(--sans);
+  font-size:16px;
+  background:var(--bg);
+  color:var(--ink);
+  -webkit-font-smoothing:antialiased;
+  overflow-x:hidden;
+}
+::-webkit-scrollbar{width:4px}
+::-webkit-scrollbar-track{background:var(--bg)}
+::-webkit-scrollbar-thumb{background:var(--bg3);border-radius:2px}
+
+.wrap{max-width:1100px;margin:0 auto;padding:0 32px}
+
+/* ── SCROLL REVEAL ── */
+.sr{opacity:0;transform:translateY(20px);transition:opacity .6s var(--ease),transform .6s var(--ease)}
+.sr.on{opacity:1;transform:none}
+
+/* ── TYPE ── */
+.display{
+  font-family:var(--serif);
+  font-size:clamp(48px,7vw,88px);
+  font-weight:400;
+  line-height:1.0;
+  letter-spacing:-.02em;
+  color:var(--ink);
+}
+.display em{font-style:italic;color:var(--blue)}
+
+.h2{
+  font-family:var(--serif);
+  font-size:clamp(32px,4.5vw,58px);
+  font-weight:400;
+  line-height:1.08;
+  letter-spacing:-.018em;
+}
+.h3{
+  font-family:var(--sans);
+  font-size:17px;
+  font-weight:500;
+  line-height:1.3;
+  letter-spacing:-.01em;
+}
+.label{
+  font-size:11px;
+  font-weight:500;
+  letter-spacing:.1em;
+  text-transform:uppercase;
+  color:var(--ink3);
+}
+.body-lg{font-size:18px;line-height:1.7;color:var(--ink2);font-weight:300}
+.body{font-size:15px;line-height:1.7;color:var(--ink3);font-weight:300}
+
+/* ── BUTTONS ── */
+.btn{
+  display:inline-flex;align-items:center;gap:8px;
+  padding:12px 22px;border-radius:7px;
+  font-size:14px;font-weight:500;
+  transition:all .22s var(--ease);
+  white-space:nowrap;
+}
+.btn-blue{background:var(--blue);color:#fff}
+.btn-blue:hover{background:var(--blue-dk);transform:translateY(-1px);box-shadow:0 6px 20px rgba(0,102,255,.25)}
+.btn-outline{border:1.5px solid var(--ink4);color:var(--ink2)}
+.btn-outline:hover{border-color:var(--ink);color:var(--ink);transform:translateY(-1px)}
+
+/* ════════════════════════════════
+   NAVBAR
+════════════════════════════════ */
+.nav{
+  position:fixed;top:0;left:0;right:0;z-index:900;
+  background:rgba(250,250,249,.88);
+  backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);
+  border-bottom:1px solid var(--bg3);
+  padding:0;
+}
+.nav-inner{
+  display:flex;align-items:center;justify-content:space-between;
+  height:60px;
+}
+.logo{display:flex;align-items:center;gap:9px}
+.logo-text{font-size:15px;font-weight:600;color:var(--ink);letter-spacing:-.01em}
+.logo-dot{color:var(--blue)}
+
+.nav-links{display:flex;align-items:center;gap:32px}
+.nav-links a:not(.btn){font-size:14px;font-weight:400;color:var(--ink3);transition:color .18s}
+.nav-links a:not(.btn):hover{color:var(--ink)}
+.nav-cta{padding:9px 18px;font-size:13px}
+
+.ham{display:none;flex-direction:column;gap:5px;padding:6px}
+.ham span{display:block;width:20px;height:1.5px;background:var(--ink);border-radius:2px;transition:.28s var(--ease)}
+.ham.open span:nth-child(1){transform:translateY(6.5px) rotate(45deg)}
+.ham.open span:nth-child(2){opacity:0}
+.ham.open span:nth-child(3){transform:translateY(-6.5px) rotate(-45deg)}
+
+.drawer{
+  display:none;position:fixed;inset:0;background:var(--bg);z-index:800;
+  flex-direction:column;justify-content:center;align-items:center;gap:40px;
+  opacity:0;pointer-events:none;transition:opacity .25s;
+}
+.drawer.open{opacity:1;pointer-events:auto}
+.drawer a{font-family:var(--serif);font-size:32px;color:var(--ink)}
+
+@media(max-width:820px){
+  .nav-links{display:none}
+  .ham{display:flex}
+  .drawer{display:flex}
+}
+
+/* ════════════════════════════════
+   HERO
+════════════════════════════════ */
+.hero{
+  padding:160px 0 100px;
+  position:relative;
+}
+.hero-inner{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:80px;
+  align-items:center;
+}
+.hero-eyebrow{
+  display:flex;align-items:center;gap:8px;
+  margin-bottom:28px;
+}
+.live-pip{
+  width:7px;height:7px;border-radius:50%;background:var(--green);
+  animation:blink 1.5s infinite;
+}
+@keyframes blink{0%,100%{opacity:1}50%{opacity:.2}}
+
+.hero-title{margin-bottom:28px}
+.hero-desc{margin-bottom:40px;max-width:440px}
+.hero-ctas{display:flex;gap:12px;flex-wrap:wrap;margin-bottom:56px}
+
+.hero-metrics{
+  display:grid;grid-template-columns:repeat(3,1fr);
+  gap:0;
+  border:1px solid var(--bg3);
+  border-radius:var(--r);
+  overflow:hidden;
+}
+.metric{
+  padding:18px 20px;
+  border-right:1px solid var(--bg3);
+}
+.metric:last-child{border-right:none}
+.metric-val{
+  font-family:var(--serif);
+  font-size:30px;font-weight:400;
+  color:var(--ink);margin-bottom:4px;
+}
+.metric-lbl{font-size:12px;color:var(--ink3);line-height:1.4}
+
+/* hero animations */
+@keyframes fadeUp{from{opacity:0;transform:translateY(20px)}to{opacity:1;transform:translateY(0)}}
+.hero-eyebrow{animation:fadeUp .5s .05s var(--ease) both}
+.hero-title   {animation:fadeUp .6s .12s var(--ease) both}
+.hero-desc    {animation:fadeUp .6s .2s  var(--ease) both}
+.hero-ctas    {animation:fadeUp .6s .28s var(--ease) both}
+.hero-metrics {animation:fadeUp .6s .36s var(--ease) both}
+.hero-visual  {animation:fadeUp .7s .1s  var(--ease) both}
+
+@media(max-width:900px){
+  .hero-inner{grid-template-columns:1fr;gap:56px}
+  .hero-visual{order:-1}
+  .hero-desc{max-width:100%}
+}
+
+/* ── PARKING GRID ── */
+.pg{
+  background:#fff;
+  border:1px solid var(--bg3);
+  border-radius:14px;
+  padding:24px;
+  box-shadow:0 1px 2px rgba(0,0,0,.04),0 8px 32px rgba(0,0,0,.06);
+}
+.pg-bar{
+  display:flex;align-items:center;justify-content:space-between;
+  margin-bottom:20px;
+}
+.pg-live{
+  display:flex;align-items:center;gap:7px;
+  font-size:11.5px;font-weight:500;color:var(--green);
+  letter-spacing:.06em;
+}
+.pg-sub{font-size:11px;color:var(--ink4)}
+
+.pg-grid{
+  display:grid;
+  grid-template-columns:repeat(8,1fr);
+  grid-template-rows:repeat(5,1fr);
+  gap:5px;
+  margin-bottom:18px;
+}
+.slot{
+  aspect-ratio:2;border-radius:5px;
+  position:relative;cursor:pointer;
+  transition:transform .15s var(--ease);
+  display:flex;align-items:center;justify-content:center;
+}
+.slot:hover{transform:scale(1.07);z-index:2}
+.slot-free{background:#DCFCE7}
+.slot-occ {background:#FEE2E2}
+.slot-res {background:#FEF9C3}
+.slot-gap {background:transparent;pointer-events:none}
+.slot-selected{outline:2px solid var(--blue);outline-offset:1px;transform:scale(1.1);z-index:3}
+.slot-num{
+  position:absolute;bottom:2px;right:4px;
+  font-size:8px;font-weight:500;color:rgba(0,0,0,.25);
+}
+.slot-car{width:65%;color:rgba(220,38,38,.5)}
+.slot-car svg{width:100%;height:auto}
+
+.pg-foot{display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px}
+.pg-legend{display:flex;gap:14px}
+.leg-item{display:flex;align-items:center;gap:6px;font-size:11.5px;color:var(--ink3)}
+.leg-dot{width:8px;height:8px;border-radius:2px}
+.pg-nums{display:flex;gap:16px}
+.pg-num{text-align:center}
+.pg-num-v{font-family:var(--serif);font-size:20px;font-weight:400}
+.pg-num-l{font-size:9.5px;text-transform:uppercase;letter-spacing:.07em;color:var(--ink4)}
+
+.visual-cap{
+  font-size:11px;color:var(--ink4);
+  text-align:center;margin-top:12px;
+}
+
+/* ════════════════════════════════
+   FEATURES
+════════════════════════════════ */
+.features{padding:100px 0;background:var(--bg)}
+.sec-header{margin-bottom:64px}
+.sec-header .label{margin-bottom:20px}
+
+.feat-grid{
+  display:grid;
+  grid-template-columns:repeat(3,1fr);
+  gap:2px;
+  background:var(--bg3);
+  border-radius:14px;
+  overflow:hidden;
+}
+.feat{
+  background:var(--bg);
+  padding:36px 30px;
+  transition:background .22s var(--ease);
+}
+.feat:hover{background:var(--bg2)}
+.feat-ico{
+  width:40px;height:40px;
+  margin-bottom:20px;
+  display:flex;align-items:center;justify-content:center;
+}
+.feat-title{margin-bottom:10px;color:var(--ink)}
+.feat-body{font-size:14px;color:var(--ink3);line-height:1.7;font-weight:300}
+
+@media(max-width:900px){.feat-grid{grid-template-columns:repeat(2,1fr)}}
+@media(max-width:560px){.feat-grid{grid-template-columns:1fr}}
+
+/* ════════════════════════════════
+   DIFFS (side-by-side)
+════════════════════════════════ */
+.diffs{padding:100px 0;background:var(--bg2)}
+.diffs-inner{
+  display:grid;grid-template-columns:1fr 1fr;
+  gap:100px;align-items:start;
+}
+.diffs-list{display:flex;flex-direction:column;gap:0}
+.diff{
+  padding:32px 0;
+  border-bottom:1px solid var(--bg3);
+  display:grid;grid-template-columns:32px 1fr;gap:20px;
+}
+.diff:first-child{border-top:1px solid var(--bg3)}
+.diff-n{font-size:11px;font-weight:500;color:var(--ink4);padding-top:3px}
+.diff-title{font-size:16px;font-weight:500;color:var(--ink);margin-bottom:8px}
+.diff-desc{font-size:14px;color:var(--ink3);line-height:1.7;font-weight:300}
+
+@media(max-width:860px){.diffs-inner{grid-template-columns:1fr;gap:52px}}
+
+/* ════════════════════════════════
+   AUDIENCE
+════════════════════════════════ */
+.audience{padding:100px 0;background:var(--bg)}
+.aud-grid{
+  display:grid;grid-template-columns:repeat(4,1fr);
+  gap:2px;background:var(--bg3);
+  border-radius:14px;overflow:hidden;
+  margin:48px 0;
+}
+.aud-card{
+  background:var(--bg);
+  padding:28px 20px;
+  display:flex;flex-direction:column;align-items:center;
+  gap:10px;text-align:center;
+  transition:background .2s;
+}
+.aud-card:hover{background:var(--bg2)}
+.aud-icon{font-size:24px}
+.aud-lbl{font-size:13px;font-weight:400;color:var(--ink2)}
+
+.mv-pair{
+  display:grid;grid-template-columns:1fr 1fr;
+  gap:2px;background:var(--bg3);
+  border-radius:14px;overflow:hidden;
+}
+.mv{
+  background:var(--bg);
+  padding:40px 36px;
+  transition:background .2s;
+}
+.mv:hover{background:var(--bg2)}
+.mv-emoji{font-size:26px;margin-bottom:16px}
+.mv-title{font-family:var(--serif);font-size:22px;font-weight:400;color:var(--ink);margin-bottom:12px}
+.mv-body{font-size:14px;color:var(--ink3);line-height:1.75;font-weight:300}
+
+@media(max-width:860px){
+  .aud-grid{grid-template-columns:repeat(2,1fr)}
+  .mv-pair{grid-template-columns:1fr}
+}
+
+/* ════════════════════════════════
+   PRICING
+════════════════════════════════ */
+.pricing{padding:100px 0;background:var(--bg2)}
+.toggle-row{
+  display:flex;align-items:center;gap:12px;
+  margin-top:28px;font-size:14px;color:var(--ink3);
+}
+.tog-lbl-on{color:var(--ink);font-weight:500}
+.tog{
+  position:relative;width:40px;height:22px;
+  background:var(--bg3);border-radius:11px;
+  border:1px solid var(--bg3);
+  cursor:pointer;transition:background .22s;
+}
+.tog.on{background:var(--blue)}
+.tog-thumb{
+  position:absolute;top:3px;left:3px;
+  width:14px;height:14px;border-radius:50%;
+  background:#fff;
+  box-shadow:0 1px 3px rgba(0,0,0,.15);
+  transition:transform .22s var(--ease);
+}
+.tog.on .tog-thumb{transform:translateX(18px)}
+.save-badge{
+  font-size:11px;font-weight:500;color:var(--blue);
+  background:var(--blue-bg);padding:2px 8px;border-radius:999px;
+}
+
+.plans{
+  display:grid;grid-template-columns:repeat(3,1fr);
+  gap:2px;background:var(--bg3);
+  border-radius:14px;overflow:hidden;
+  margin-top:48px;
+}
+.plan{
+  background:var(--bg);
+  padding:36px 30px;
+  position:relative;
+  transition:background .22s;
+}
+.plan:hover{background:#fff}
+.plan-hot{background:#fff}
+.plan-name{font-size:13px;font-weight:600;color:var(--ink);letter-spacing:.04em;text-transform:uppercase;margin-bottom:6px}
+.plan-vagas{font-size:12px;color:var(--ink4);margin-bottom:24px}
+.plan-price{
+  font-family:var(--serif);
+  font-size:36px;font-weight:400;
+  color:var(--ink);
+  display:flex;align-items:baseline;gap:4px;
+  margin-bottom:28px;
+}
+.plan-price sub{font-family:var(--sans);font-size:13px;font-weight:400;color:var(--ink3)}
+.plan-tag{
+  display:inline-flex;align-items:center;
+  background:var(--blue);color:#fff;
+  font-size:10px;font-weight:600;
+  padding:3px 10px;border-radius:4px;
+  letter-spacing:.05em;text-transform:uppercase;
+  margin-bottom:20px;
+}
+.plan-sep{height:1px;background:var(--bg3);margin-bottom:24px}
+.plan-feats{display:flex;flex-direction:column;gap:10px;margin-bottom:28px}
+.plan-feat{display:flex;align-items:flex-start;gap:9px;font-size:13.5px;color:var(--ink3);font-weight:300;line-height:1.4}
+.plan-feat svg{flex-shrink:0;margin-top:1px;color:var(--green)}
+.plan-btn{width:100%;justify-content:center}
+
+@media(max-width:900px){
+  .plans{grid-template-columns:1fr;max-width:420px}
+}
+
+/* ════════════════════════════════
+   CONTACT
+════════════════════════════════ */
+.contact{padding:100px 0;background:var(--bg)}
+.contact-inner{
+  display:grid;grid-template-columns:1fr 1.15fr;
+  gap:80px;align-items:start;
+}
+.contact-desc{margin:18px 0 40px;max-width:360px}
+.cinfo-list{display:flex;flex-direction:column;gap:18px}
+.cinfo{display:flex;align-items:center;gap:14px}
+.cinfo-ico{
+  width:36px;height:36px;border-radius:8px;
+  background:var(--bg2);
+  display:flex;align-items:center;justify-content:center;
+  font-size:16px;flex-shrink:0;
+}
+.cinfo-lbl{font-size:11px;text-transform:uppercase;letter-spacing:.08em;color:var(--ink4);margin-bottom:1px}
+.cinfo-val{font-size:14.5px;font-weight:400;color:var(--ink)}
+
+.form-box{
+  background:#fff;
+  border:1px solid var(--bg3);
+  border-radius:14px;
+  padding:36px;
+  box-shadow:0 1px 2px rgba(0,0,0,.04),0 8px 32px rgba(0,0,0,.05);
+}
+.form-title{font-size:16px;font-weight:500;color:var(--ink);margin-bottom:24px}
+.cform{display:flex;flex-direction:column;gap:16px}
+.frow{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.fg{display:flex;flex-direction:column;gap:6px}
+.fg label{font-size:11px;font-weight:500;text-transform:uppercase;letter-spacing:.08em;color:var(--ink3)}
+.fg input,.fg textarea{
+  background:var(--bg);
+  border:1px solid var(--bg3);
+  border-radius:7px;padding:11px 13px;
+  font-family:var(--sans);font-size:14px;
+  color:var(--ink);outline:none;resize:vertical;
+  transition:border-color .18s,box-shadow .18s;
+}
+.fg input::placeholder,.fg textarea::placeholder{color:var(--ink4)}
+.fg input:focus,.fg textarea:focus{
+  border-color:var(--blue);
+  box-shadow:0 0 0 3px rgba(0,102,255,.08);
+  background:#fff;
+}
+.form-submit{align-self:flex-start}
+
+.form-ok{
+  display:flex;flex-direction:column;align-items:center;
+  justify-content:center;gap:14px;padding:56px 24px;text-align:center;
+}
+.ok-ico{font-size:42px}
+.ok-h{font-family:var(--serif);font-size:24px;color:var(--ink)}
+.ok-p{font-size:14px;color:var(--ink3)}
+
+@media(max-width:860px){
+  .contact-inner{grid-template-columns:1fr;gap:52px}
+  .frow{grid-template-columns:1fr}
+}
+
+/* ════════════════════════════════
+   FOOTER
+════════════════════════════════ */
+footer{
+  background:var(--ink);
+  color:rgba(255,255,255,.55);
+  padding:60px 0 0;
+}
+.ft-inner{
+  display:grid;grid-template-columns:1.8fr 1fr;
+  gap:64px;padding-bottom:52px;
+}
+.ft-logo-text{font-size:15px;font-weight:600;color:#fff;margin-bottom:8px;display:block}
+.ft-tag{font-size:13px;margin-bottom:24px;display:block}
+.ft-vals{display:flex;flex-wrap:wrap;gap:7px}
+.ft-val{
+  font-size:11px;padding:3px 11px;border-radius:999px;
+  background:rgba(255,255,255,.07);color:rgba(255,255,255,.4);
+}
+.ft-cols{display:flex;gap:48px}
+.ft-col{display:flex;flex-direction:column;gap:10px}
+.ft-col h4{
+  font-size:11px;font-weight:600;text-transform:uppercase;
+  letter-spacing:.1em;color:rgba(255,255,255,.3);margin-bottom:4px;
+}
+.ft-col a{font-size:13.5px;color:rgba(255,255,255,.35);transition:color .18s}
+.ft-col a:hover{color:#fff}
+.ft-btm{
+  border-top:1px solid rgba(255,255,255,.07);
+  display:flex;justify-content:space-between;align-items:center;
+  padding:20px 32px;font-size:12px;
+}
+
+@media(max-width:760px){
+  .ft-inner{grid-template-columns:1fr;gap:44px}
+  .ft-btm{flex-direction:column;gap:6px;text-align:center}
+}
+</style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav class="nav" id="nav">
+  <div class="nav-inner wrap">
+    <a href="#hero" class="logo">
+      <svg width="28" height="28" viewBox="0 0 28 28" fill="none">
+        <rect width="28" height="28" rx="7" fill="var(--ink)"/>
+        <path d="M7 21V7h9.5c3.6 0 6.5 2.6 6.5 6s-2.9 6-6.5 6H11v2Z" fill="white" opacity=".9"/>
+        <path d="M11 10.5v5h4.5c1.6 0 2.8-1.1 2.8-2.5S17.1 10.5 15.5 10.5Z" fill="var(--ink)" opacity=".5"/>
+        <circle cx="15.5" cy="13" r="2.8" fill="var(--ink)"/>
+        <circle cx="15.5" cy="13" r="1.2" fill="white" opacity=".6"/>
+      </svg>
+      <span class="logo-text">Parking<span class="logo-dot">.</span>Spaces</span>
+    </a>
+    <ul class="nav-links">
+      <li><a href="#produto">Produto</a></li>
+      <li><a href="#diferenciais">Diferenciais</a></li>
+      <li><a href="#publico">Público</a></li>
+      <li><a href="#planos">Planos</a></li>
+      <li><a href="#contato" class="btn btn-blue nav-cta">Fale Conosco</a></li>
+    </ul>
+    <button class="ham" id="ham" aria-label="Menu"><span></span><span></span><span></span></button>
+  </div>
+</nav>
+
+<div class="drawer" id="drawer">
+  <a href="#produto"      onclick="closeMenu()">Produto</a>
+  <a href="#diferenciais" onclick="closeMenu()">Diferenciais</a>
+  <a href="#publico"      onclick="closeMenu()">Público</a>
+  <a href="#planos"       onclick="closeMenu()">Planos</a>
+  <a href="#contato"      onclick="closeMenu()" class="btn btn-blue">Fale Conosco</a>
+</div>
+
+<!-- HERO -->
+<section class="hero" id="hero">
+  <div class="wrap hero-inner">
+    <div class="hero-text">
+      <div class="hero-eyebrow">
+        <span class="live-pip"></span>
+        <span class="label" style="color:var(--green);letter-spacing:.12em">Sistema ativo agora</span>
+      </div>
+      <h1 class="display hero-title">
+        O estacionamento<br>
+        que se <em>gerencia.</em>
+      </h1>
+      <p class="body-lg hero-desc">
+        Visão computacional, sensores IoT e painel unificado — tudo para que gestores saibam exatamente o que está acontecendo, em tempo real.
+      </p>
+      <div class="hero-ctas">
+        <a href="#contato" class="btn btn-blue">Solicitar demonstração</a>
+        <a href="#produto" class="btn btn-outline">Ver funcionalidades</a>
+      </div>
+      <div class="hero-metrics">
+        <div class="metric">
+          <div class="metric-val">94%</div>
+          <div class="metric-lbl">Precisão de detecção</div>
+        </div>
+        <div class="metric">
+          <div class="metric-val">3×</div>
+          <div class="metric-lbl">Eficiência operacional</div>
+        </div>
+        <div class="metric">
+          <div class="metric-val">&lt;2s</div>
+          <div class="metric-lbl">Latência de resposta</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="hero-visual">
+      <div class="pg">
+        <div class="pg-bar">
+          <div class="pg-live">
+            <span class="live-pip"></span>
+            Monitoramento ao vivo
+          </div>
+          <span class="pg-sub">Clique em qualquer vaga</span>
+        </div>
+        <div class="pg-grid" id="pgGrid"></div>
+        <div class="pg-foot">
+          <div class="pg-legend">
+            <span class="leg-item"><span class="leg-dot" style="background:#BBF7D0"></span>Livre</span>
+            <span class="leg-item"><span class="leg-dot" style="background:#FECACA"></span>Ocupada</span>
+            <span class="leg-item"><span class="leg-dot" style="background:#FEF08A"></span>Reservada</span>
+          </div>
+          <div class="pg-nums" id="pgNums"></div>
+        </div>
+      </div>
+      <p class="visual-cap">Simulação interativa — dados atualizados automaticamente</p>
+    </div>
+  </div>
+</section>
+
+<!-- FEATURES -->
+<section class="features" id="produto">
+  <div class="wrap">
+    <div class="sec-header sr">
+      <span class="label">O Produto</span>
+      <h2 class="h2" style="max-width:520px">Hardware e software em uma plataforma única</h2>
+    </div>
+
+    <div class="feat-grid">
+      <div class="feat sr">
+        <div class="feat-ico">
+          <svg width="40" height="40" viewBox="0 0 40 40" fill="none">
+            <circle cx="20" cy="20" r="17" stroke="var(--blue)" stroke-width="1.2" stroke-dasharray="3.5 3"/>
+            <circle cx="20" cy="20" r="7.5" fill="var(--blue-bg)" stroke="var(--blue)" stroke-width="1.4"/>
+            <circle cx="20" cy="20" r="3" fill="var(--blue)"/>
+            <line x1="20" y1="3" x2="20" y2="7" stroke="var(--blue)" stroke-width="1.6" stroke-linecap="round"/>
+            <line x1="20" y1="33" x2="20" y2="37" stroke="var(--blue)" stroke-width="1.6" stroke-linecap="round"/>
+            <line x1="3" y1="20" x2="7" y2="20" stroke="var(--blue)" stroke-width="1.6" stroke-linecap="round"/>
+            <line x1="33" y1="20" x2="37" y2="20" stroke="var(--blue)" stroke-width="1.6" stroke-linecap="round"/>
+          </svg>
+        </div>
+        <h3 class="h3 feat-title">Monitoramento em Tempo Real</h3>
+        <p class="feat-body">Câmeras e sensores IoT atualizam o status de cada vaga em menos de 2 segundos. Painel centralizado acessível de qualquer dispositivo.</p>
+      </div>
+
+      <div class="feat sr" style="transition-delay:.07s">
+        <div class="feat-ico">
+          <svg width="40" height="40" viewBox="0 0 40 40" fill="none">
+            <rect x="4" y="8" width="32" height="24" rx="4" stroke="var(--green)" stroke-width="1.4"/>
+            <path d="M12 20l6 6 10-12" stroke="var(--green)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+            <rect x="10" y="4" width="5" height="8" rx="2" fill="rgba(22,163,74,.12)" stroke="var(--green)" stroke-width="1.4"/>
+            <rect x="25" y="4" width="5" height="8" rx="2" fill="rgba(22,163,74,.12)" stroke="var(--green)" stroke-width="1.4"/>
+          </svg>
+        </div>
+        <h3 class="h3 feat-title">Controle Automatizado de Acesso</h3>
+        <p class="feat-body">Reconhecimento de placas elimina tickets físicos e reduz filas em até 80%. Entrada e saída fluem sem intervenção humana.</p>
+      </div>
+
+      <div class="feat sr" style="transition-delay:.14s">
+        <div class="feat-ico">
+          <svg width="40" height="40" viewBox="0 0 40 40" fill="none">
+            <rect x="4" y="8" width="32" height="24" rx="3" stroke="var(--amber)" stroke-width="1.4"/>
+            <polyline points="8,28 14,20 20,24 27,14 34,18" stroke="var(--amber)" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+            <circle cx="34" cy="10" r="3.5" fill="rgba(217,119,6,.15)" stroke="var(--amber)" stroke-width="1.4"/>
+          </svg>
+        </div>
+        <h3 class="h3 feat-title">Relatórios e Análises</h3>
+        <p class="feat-body">Ocupação histórica, horários de pico e rotatividade em dashboards claros. Décidões baseadas em dados, não em intuição.</p>
+      </div>
+
+      <div class="feat sr" style="transition-delay:.05s">
+        <div class="feat-ico">
+          <svg width="40" height="40" viewBox="0 0 40 40" fill="none">
+            <rect x="6" y="10" width="18" height="22" rx="3" stroke="#7C3AED" stroke-width="1.4"/>
+            <path d="M24 16l12-6v20l-12-6" stroke="#7C3AED" stroke-width="1.4" stroke-linejoin="round"/>
+            <circle cx="15" cy="21" r="3.5" stroke="#7C3AED" stroke-width="1.4"/>
+            <circle cx="15" cy="21" r="1.5" fill="#7C3AED"/>
+          </svg>
+        </div>
+        <h3 class="h3 feat-title">Visão Computacional</h3>
+        <p class="feat-body">Algoritmos treinados com dados brasileiros — chuva, sombra, contraluz. 94% de precisão sem depender de conectividade constante.</p>
+      </div>
+
+      <div class="feat sr" style="transition-delay:.12s">
+        <div class="feat-ico">
+          <svg width="40" height="40" viewBox="0 0 40 40" fill="none">
+            <circle cx="16" cy="14" r="6" stroke="#EA580C" stroke-width="1.4"/>
+            <path d="M6 34c0-7 4-11 10-11s10 4 10 11" stroke="#EA580C" stroke-width="1.4" stroke-linecap="round"/>
+            <circle cx="30" cy="10" r="4.5" stroke="#EA580C" stroke-width="1.4"/>
+            <path d="M28 20c4 0 7.5 3 7.5 8" stroke="#EA580C" stroke-width="1.4" stroke-linecap="round"/>
+          </svg>
+        </div>
+        <h3 class="h3 feat-title">Portal do Gestor</h3>
+        <p class="feat-body">Métricas, alertas e configurações de acesso num único painel. Notificações automáticas por WhatsApp e e-mail em eventos críticos.</p>
+      </div>
+
+      <div class="feat sr" style="transition-delay:.19s">
+        <div class="feat-ico">
+          <svg width="40" height="40" viewBox="0 0 40 40" fill="none">
+            <rect x="3" y="18" width="10" height="14" rx="2" fill="rgba(0,102,255,.08)" stroke="var(--blue)" stroke-width="1.4"/>
+            <rect x="15" y="10" width="10" height="22" rx="2" fill="rgba(0,102,255,.08)" stroke="var(--blue)" stroke-width="1.4"/>
+            <rect x="27" y="4" width="10" height="28" rx="2" fill="rgba(0,102,255,.08)" stroke="var(--blue)" stroke-width="1.4"/>
+          </svg>
+        </div>
+        <h3 class="h3 feat-title">Escalabilidade Modular</h3>
+        <p class="feat-body">De 20 vagas a complexos com milhares — a arquitetura cresce com o negócio sem reconfigurar a base instalada.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- DIFFERENTIALS -->
+<section class="diffs" id="diferenciais">
+  <div class="wrap diffs-inner">
+    <div class="sr">
+      <span class="label" style="display:block;margin-bottom:20px">Diferenciais</span>
+      <h2 class="h2" style="max-width:380px;margin-bottom:20px">Por que a Parking Spaces?</h2>
+      <p class="body" style="max-width:340px;font-size:16px;color:var(--ink2)">A gestão de estacionamentos no Brasil ainda é feita com papel, ticket e guichê. Nós mudamos isso com tecnologia que cabe no orçamento real do gestor.</p>
+    </div>
+
+    <div class="diffs-list">
+      <div class="diff sr">
+        <span class="diff-n">01</span>
+        <div>
+          <p class="diff-title">Visão Computacional Própria</p>
+          <p class="diff-desc">Modelos treinados em cenários reais brasileiros. Funciona com chuva, sombra e contraluz sem depender de internet constante.</p>
+        </div>
+      </div>
+      <div class="diff sr" style="transition-delay:.08s">
+        <span class="diff-n">02</span>
+        <div>
+          <p class="diff-title">Instalação Sem Obra</p>
+          <p class="diff-desc">Câmeras wireless plug-and-play. Um dia útil de instalação, sem quebrar piso ou alterar a infraestrutura existente.</p>
+        </div>
+      </div>
+      <div class="diff sr" style="transition-delay:.16s">
+        <span class="diff-n">03</span>
+        <div>
+          <p class="diff-title">Retorno em até 6 Meses</p>
+          <p class="diff-desc">Menos manobristas, menos erros de cobrança, menos congestionamento interno. ROI mensurável e previsível.</p>
+        </div>
+      </div>
+      <div class="diff sr" style="transition-delay:.24s">
+        <span class="diff-n">04</span>
+        <div>
+          <p class="diff-title">Dados que Geram Ação</p>
+          <p class="diff-desc">Gestores sabem em qual horário o estacionamento chega a 90% de lotação — e agem antes do congestionamento, não depois.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- AUDIENCE -->
+<section class="audience" id="publico">
+  <div class="wrap">
+    <div class="sr">
+      <span class="label" style="display:block;margin-bottom:20px">Público-Alvo</span>
+      <h2 class="h2">Feito para quem gerencia<br>fluxo constante de veículos</h2>
+    </div>
+
+    <div class="aud-grid sr" style="transition-delay:.1s">
+      <div class="aud-card"><span class="aud-icon">🏬</span><span class="aud-lbl">Shopping Centers</span></div>
+      <div class="aud-card"><span class="aud-icon">🎓</span><span class="aud-lbl">Universidades</span></div>
+      <div class="aud-card"><span class="aud-icon">🏢</span><span class="aud-lbl">Condomínios</span></div>
+      <div class="aud-card"><span class="aud-icon">🏥</span><span class="aud-lbl">Hospitais</span></div>
+      <div class="aud-card"><span class="aud-icon">✈️</span><span class="aud-lbl">Aeroportos</span></div>
+      <div class="aud-card"><span class="aud-icon">🏭</span><span class="aud-lbl">Empresas Privadas</span></div>
+      <div class="aud-card"><span class="aud-icon">🌆</span><span class="aud-lbl">Centros Empresariais</span></div>
+      <div class="aud-card"><span class="aud-icon">🅿️</span><span class="aud-lbl">Estac. Públicos</span></div>
+    </div>
+
+    <div class="mv-pair sr" style="transition-delay:.15s">
+      <div class="mv">
+        <div class="mv-emoji">🎯</div>
+        <h3 class="mv-title">Missão</h3>
+        <p class="mv-body">Proporcionar soluções tecnológicas inovadoras para gestão de estacionamentos, promovendo eficiência, segurança e melhor experiência para usuários e administradores.</p>
+      </div>
+      <div class="mv">
+        <div class="mv-emoji">🚀</div>
+        <h3 class="mv-title">Visão</h3>
+        <p class="mv-body">Ser a plataforma líder em gestão inteligente de estacionamentos no Brasil e expandir para a América Latina, contribuindo para uma mobilidade urbana mais inteligente.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- PRICING -->
+<section class="pricing" id="planos">
+  <div class="wrap">
+    <div class="sr">
+      <span class="label" style="display:block;margin-bottom:20px">Planos</span>
+      <h2 class="h2" style="margin-bottom:14px">Simples e transparente</h2>
+      <p class="body" style="font-size:16px;color:var(--ink2)">Sem taxa de setup. Cancele quando quiser. Migre de plano a qualquer momento.</p>
+      <div class="toggle-row">
+        <span id="lblM" class="tog-lbl-on">Mensal</span>
+        <button class="tog" id="togBtn" onclick="togglePricing()" aria-label="Alternar período de cobrança">
+          <span class="tog-thumb"></span>
+        </button>
+        <span id="lblA">Anual</span>
+        <span class="save-badge">Economize 16%</span>
+      </div>
+    </div>
+
+    <div class="plans">
+      <div class="plan sr">
+        <div class="plan-name">Starter</div>
+        <div class="plan-vagas">até 50 vagas</div>
+        <div class="plan-price"><span id="p0v">R$&nbsp;890</span><sub>/mês</sub></div>
+        <div class="plan-sep"></div>
+        <ul class="plan-feats">
+          <li class="plan-feat"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg>Monitoramento em tempo real</li>
+          <li class="plan-feat"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg>Painel de gestão web</li>
+          <li class="plan-feat"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg>1 câmera inclusa</li>
+          <li class="plan-feat"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg>Relatórios mensais</li>
+          <li class="plan-feat"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg>Suporte por e-mail</li>
+        </ul>
+        <a href="#contato" class="btn btn-outline plan-btn">Começar agora</a>
+      </div>
+
+      <div class="plan plan-hot sr" style="transition-delay:.1s">
+        <div class="plan-tag">Mais popular</div>
+        <div class="plan-name">Business</div>
+        <div class="plan-vagas">até 300 vagas</div>
+        <div class="plan-price"><span id="p1v">R$&nbsp;2.490</span><sub>/mês</sub></div>
+        <div class="plan-sep"></div>
+        <ul class="plan-feats">
+          <li class="plan-feat"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg>Tudo do Starter</li>
+          <li class="plan-feat"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg>Reconhecimento de placas (LPR)</li>
+          <li class="plan-feat"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg>Controle de acesso automático</li>
+          <li class="plan-feat"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg>4 câmeras inclusas</li>
+          <li class="plan-feat"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg>App mobile para gestores</li>
+          <li class="plan-feat"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg>Suporte prioritário (WhatsApp)</li>
+        </ul>
+        <a href="#contato" class="btn btn-blue plan-btn">Solicitar demo</a>
+      </div>
+
+      <div class="plan sr" style="transition-delay:.2s">
+        <div class="plan-name">Enterprise</div>
+        <div class="plan-vagas">vagas ilimitadas</div>
+        <div class="plan-price" style="font-size:24px;align-items:center">Sob consulta</div>
+        <div class="plan-sep"></div>
+        <ul class="plan-feats">
+          <li class="plan-feat"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg>Tudo do Business</li>
+          <li class="plan-feat"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg>Câmeras ilimitadas</li>
+          <li class="plan-feat"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg>Integração ERP / PMS</li>
+          <li class="plan-feat"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg>SLA 99,9% garantido</li>
+          <li class="plan-feat"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg>Gerente de conta dedicado</li>
+          <li class="plan-feat"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg>Plano corporativo personalizado</li>
+        </ul>
+        <a href="#contato" class="btn btn-outline plan-btn">Falar com vendas</a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- CONTACT -->
+<section class="contact" id="contato">
+  <div class="wrap contact-inner">
+    <div class="sr">
+      <span class="label" style="display:block;margin-bottom:20px">Contato</span>
+      <h2 class="h2">Vamos transformar<br>seu estacionamento?</h2>
+      <p class="body contact-desc" style="font-size:16px;color:var(--ink2)">
+        Fale com nossa equipe e agende uma demonstração gratuita. Respondemos em até 24 horas.
+      </p>
+      <div class="cinfo-list">
+        <div class="cinfo">
+          <span class="cinfo-ico">📧</span>
+          <div><div class="cinfo-lbl">E-mail</div><div class="cinfo-val">contato@parkingspaces.com.br</div></div>
+        </div>
+        <div class="cinfo">
+          <span class="cinfo-ico">📱</span>
+          <div><div class="cinfo-lbl">WhatsApp</div><div class="cinfo-val">+55 (44) 99999-0000</div></div>
+        </div>
+        <div class="cinfo">
+          <span class="cinfo-ico">📍</span>
+          <div><div class="cinfo-lbl">Sede</div><div class="cinfo-val">Maringá, Paraná – Brasil</div></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="form-box sr" style="transition-delay:.15s">
+      <div id="formArea">
+        <h3 class="form-title">Demo gratuita</h3>
+        <form class="cform" onsubmit="submitForm(event)">
+          <div class="frow">
+            <div class="fg">
+              <label for="fn">Nome *</label>
+              <input id="fn" type="text" placeholder="Seu nome completo" required/>
+            </div>
+            <div class="fg">
+              <label for="fe">E-mail *</label>
+              <input id="fe" type="email" placeholder="seu@email.com" required/>
+            </div>
+          </div>
+          <div class="fg">
+            <label for="fo">Organização</label>
+            <input id="fo" type="text" placeholder="Nome da empresa ou instituição"/>
+          </div>
+          <div class="fg">
+            <label for="fm">Mensagem</label>
+            <textarea id="fm" rows="4" placeholder="Conte sobre o seu estacionamento..."></textarea>
+          </div>
+          <button type="submit" class="btn btn-blue form-submit">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
+            Enviar
+          </button>
+        </form>
+      </div>
+      <div id="formOk" class="form-ok" style="display:none">
+        <div class="ok-ico">✅</div>
+        <h3 class="ok-h">Mensagem enviada</h3>
+        <p class="ok-p">Nossa equipe responde em até 24 horas úteis.</p>
+        <button class="btn btn-outline" style="margin-top:8px" onclick="resetForm()">Enviar outra mensagem</button>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer>
+  <div class="wrap ft-inner">
+    <div>
+      <span class="ft-logo-text">Parking<span style="color:var(--blue)">.</span>Spaces</span>
+      <span class="ft-tag">Gestão Inteligente de Estacionamento</span>
+      <div class="ft-vals">
+        <span class="ft-val">Inovação</span>
+        <span class="ft-val">Segurança</span>
+        <span class="ft-val">Agilidade</span>
+        <span class="ft-val">Transparência</span>
+        <span class="ft-val">Sustentabilidade</span>
+        <span class="ft-val">Mobilidade Inteligente</span>
+      </div>
+    </div>
+    <div class="ft-cols">
+      <div class="ft-col">
+        <h4>Produto</h4>
+        <a href="#produto">Funcionalidades</a>
+        <a href="#diferenciais">Diferenciais</a>
+        <a href="#planos">Planos</a>
+      </div>
+      <div class="ft-col">
+        <h4>Empresa</h4>
+        <a href="#publico">Público-Alvo</a>
+        <a href="#contato">Contato</a>
+        <a href="#contato">Parcerias</a>
+      </div>
+    </div>
+  </div>
+  <div class="ft-btm">
+    <span>© 2025 Parking Spaces. Todos os direitos reservados.</span>
+    <span>Maringá, Paraná — Brasil</span>
+  </div>
+</footer>
+
+<script>
+// NAV
+window.addEventListener('scroll',()=>{
+  document.getElementById('nav').style.borderBottomColor = window.scrollY>10?'var(--bg3)':'transparent';
+});
+const ham=document.getElementById('ham'),drawer=document.getElementById('drawer');
+ham.addEventListener('click',()=>{ham.classList.toggle('open');drawer.classList.toggle('open')});
+function closeMenu(){ham.classList.remove('open');drawer.classList.remove('open')}
+
+// SCROLL REVEAL
+new IntersectionObserver(entries=>{
+  entries.forEach(e=>{if(e.isIntersecting)e.target.classList.add('on')});
+},{threshold:.1,rootMargin:'0px 0px -30px 0px'})
+.observe.call(
+  new IntersectionObserver(entries=>{entries.forEach(e=>{if(e.isIntersecting)e.target.classList.add('on')})},{threshold:.1,rootMargin:'0px 0px -30px 0px'}),
+  document.body
+);
+
+(()=>{
+  const io=new IntersectionObserver(entries=>{
+    entries.forEach(e=>{if(e.isIntersecting)e.target.classList.add('on')});
+  },{threshold:.1,rootMargin:'0px 0px -30px 0px'});
+  document.querySelectorAll('.sr').forEach(el=>io.observe(el));
+})();
+
+// PARKING GRID
+const ROWS=5,COLS=8,LANE=3;
+const ST=['free','occ','res'];
+let slots=Array.from({length:ROWS*COLS},(_,i)=>({
+  id:i,
+  status:Math.random()<.54?'occ':Math.random()<.1?'res':'free'
+}));
+let sel=null;
+
+function render(){
+  const g=document.getElementById('pgGrid');
+  g.innerHTML='';
+  slots.forEach((s,i)=>{
+    const col=i%COLS;
+    if(col===LANE){
+      // invisible lane spacer
+      const sp=document.createElement('div');
+      sp.className='slot slot-gap';
+      g.appendChild(sp);
+    }
+    const el=document.createElement('div');
+    el.className=`slot slot-${s.status}${sel===s.id?' slot-selected':''}`;
+    el.innerHTML=`
+      ${s.status==='occ'?`<div class="slot-car"><svg viewBox="0 0 24 12" fill="none"><rect x="1" y="3" width="22" height="7" rx="2" fill="currentColor" opacity=".45"/><rect x="5" y="1" width="14" height="5" rx="1.5" fill="currentColor" opacity=".3"/><circle cx="6" cy="10" r="1.8" fill="currentColor" opacity=".35"/><circle cx="18" cy="10" r="1.8" fill="currentColor" opacity=".35"/></svg></div>`:''}
+      <span class="slot-num">${i+1}</span>`;
+    el.addEventListener('click',()=>{sel=sel===s.id?null:s.id;render();renderNums()});
+    g.appendChild(el);
+  });
+}
+
+function renderNums(){
+  const free=slots.filter(s=>s.status==='free').length;
+  const occ =slots.filter(s=>s.status==='occ').length;
+  const res =slots.filter(s=>s.status==='res').length;
+  document.getElementById('pgNums').innerHTML=`
+    <div class="pg-num"><div class="pg-num-v" style="color:var(--green)">${free}</div><div class="pg-num-l">Livres</div></div>
+    <div class="pg-num"><div class="pg-num-v" style="color:var(--red)">${occ}</div><div class="pg-num-l">Ocupadas</div></div>
+    <div class="pg-num"><div class="pg-num-v" style="color:var(--amber)">${res}</div><div class="pg-num-l">Reservadas</div></div>`;
+}
+render();renderNums();
+setInterval(()=>{
+  const i=Math.floor(Math.random()*slots.length);
+  const cur=slots[i].status;
+  slots[i].status=ST.filter(s=>s!==cur)[Math.floor(Math.random()*2)];
+  render();renderNums();
+},1400);
+
+// PRICING
+let annual=false;
+function togglePricing(){
+  annual=!annual;
+  document.getElementById('togBtn').classList.toggle('on',annual);
+  document.getElementById('lblM').classList.toggle('tog-lbl-on',!annual);
+  document.getElementById('lblA').classList.toggle('tog-lbl-on',annual);
+  document.getElementById('p0v').innerHTML=annual?'R$&nbsp;740':'R$&nbsp;890';
+  document.getElementById('p1v').innerHTML=annual?'R$&nbsp;2.090':'R$&nbsp;2.490';
+}
+
+// FORM
+function submitForm(e){
+  e.preventDefault();
+  document.getElementById('formArea').style.display='none';
+  document.getElementById('formOk').style.display='flex';
+}
+function resetForm(){
+  document.getElementById('formArea').style.display='block';
+  document.getElementById('formOk').style.display='none';
+  document.querySelectorAll('.cform input,.cform textarea').forEach(el=>el.value='');
+}
+</script>
+</body>
+</html>
